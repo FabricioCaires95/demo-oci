@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: demo-receiver
+  threads:
+    virtual:
+      enabled: false
+  profiles:
+    active: default
+
+
+fpb:
+  endpoint:
+    url: "http://fpb.corp.default"
+
+
+custom:
+  proxy:
+    uri: "localhost"
+    port: "8899"
+    username: "client"
+    password: "pass"
