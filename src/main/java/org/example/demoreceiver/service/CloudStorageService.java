@@ -4,6 +4,8 @@ import com.oracle.bmc.ConfigFileReader;
 import com.oracle.bmc.Region;
 import com.oracle.bmc.auth.AuthenticationDetailsProvider;
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider;
+import com.oracle.bmc.http.client.ProxyConfiguration;
+import com.oracle.bmc.http.client.StandardClientProperties;
 import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
@@ -15,11 +17,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 @Service
 public class CloudStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudStorageService.class);
+    private static final String PROXY_URI = "localhost";
+    private static final int PROXY_PORT = 8889;
+    private static final String PROXY_USERNAME = "username";
+    private static final String PROXY_PASSWORD = "password";
 
     public void downloadFileFromBucket(String bucketName, String fileName) {
 
@@ -27,9 +35,18 @@ public class CloudStorageService {
             final ConfigFileReader.ConfigFile configFileReader = ConfigFileReader.parseDefault();
             final AuthenticationDetailsProvider provider = new ConfigFileAuthenticationDetailsProvider(configFileReader);
 
+            final ProxyConfiguration proxyConfiguration =
+                    ProxyConfiguration.builder()
+                            .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(PROXY_URI, PROXY_PORT)))
+                            .username(PROXY_USERNAME)
+                            .password(PROXY_PASSWORD.toCharArray())
+                            .build();
+
+
             ObjectStorageClient objectStorageClient = ObjectStorageClient
                     .builder()
                     .region(Region.SA_SAOPAULO_1)
+                    .clientConfigurator(httpClientBuilder -> httpClientBuilder.property(StandardClientProperties.PROXY, proxyConfiguration))
                     .build(provider);
 
             GetObjectRequest objectRequest = GetObjectRequest
