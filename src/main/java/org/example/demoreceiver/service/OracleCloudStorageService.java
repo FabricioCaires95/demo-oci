@@ -9,6 +9,7 @@ import com.oracle.bmc.http.client.StandardClientProperties;
 import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
+import org.example.demoreceiver.model.CloudProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,17 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 
 @Service
-public class CloudStorageService {
+public class OracleCloudStorageService implements CloudStorage {
 
-    private static final Logger logger = LoggerFactory.getLogger(CloudStorageService.class);
+    private static final Logger logger = LoggerFactory.getLogger(OracleCloudStorageService.class);
     private static final String PROXY_URI = "localhost";
     private static final int PROXY_PORT = 8889;
     private static final String PROXY_USERNAME = "username";
     private static final String PROXY_PASSWORD = "password";
 
+    @Override
     public void downloadFileFromBucket(String bucketName, String fileName) {
+        logger.info("OCI service injected");
 
         try {
             final ConfigFileReader.ConfigFile configFileReader = ConfigFileReader.parseDefault();
@@ -71,6 +74,11 @@ public class CloudStorageService {
         }
     }
 
+    @Override
+    public String getProvider() {
+        return CloudProvider.OCI.name();
+    }
+
     public void copyFileToFileServer(InputStream inputStream, String fileName) {
         String directoryPath = "/opt/oci/file";
         logger.info("Starting to copy file: [{}] to file server: [{}] ", fileName, directoryPath);
@@ -88,7 +96,8 @@ public class CloudStorageService {
             logger.error("Error occurred while copying file to file server: ", e);
             throw new RuntimeException(e);
         }
-
     }
+
+
 
 }

@@ -1,5 +1,6 @@
 package org.example.demoreceiver.service;
 
+import org.example.demoreceiver.model.CloudProvider;
 import org.example.demoreceiver.model.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +19,14 @@ public class ConsumerService {
 
     private final ExecutorService executorService;
     private final ConcurrentKafkaListenerContainerFactory<String, String> kafkaMessageListener;
-    private final CloudStorageService cloudStorageService;
+    private final CloudStorageStrategyManager cloudStorageStrategyManager;
 
     public ConsumerService(ExecutorService executorService,
                            ConcurrentKafkaListenerContainerFactory<String, String> kafkaMessageListener,
-                           CloudStorageService cloudStorageService) {
+                           CloudStorageStrategyManager cloudStorageStrategyManager) {
         this.executorService = executorService;
         this.kafkaMessageListener = kafkaMessageListener;
-        this.cloudStorageService = cloudStorageService;
+        this.cloudStorageStrategyManager = cloudStorageStrategyManager;
     }
 
     public void startConsumers(List<Exchange> exchanges) {
@@ -41,7 +42,10 @@ public class ConsumerService {
         container.setupMessageListener((MessageListener<String, String>) data -> {
             logger.info("Current thread: {}", Thread.currentThread().getName());
             logger.info("Received message {}", data);
-            cloudStorageService.downloadFileFromBucket(exchange.bucketName(), exchange.streamingPool());
+
+            CloudStorage cloudStorage = cloudStorageStrategyManager.getStrategy(CloudProvider.getCloudProvider(1));
+
+            cloudStorage.downloadFileFromBucket(exchange.bucketName(), exchange.streamingPool());
         });
         container.start();
     }
