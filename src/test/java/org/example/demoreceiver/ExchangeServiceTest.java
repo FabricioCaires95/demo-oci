@@ -4,12 +4,10 @@ import org.example.demoreceiver.model.Exchange;
 import org.example.demoreceiver.service.ExchangeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -85,9 +83,9 @@ public class ExchangeServiceTest {
 
 
     private List<Exchange> mockExchangeListResponse() {
-        return List.of(new Exchange("test1", "edr.str"),
-                new Exchange("test2", "edr.str"),
-                new Exchange("test3", "edr.str"));
+        return List.of(new Exchange("test1", "edr.str", 1, "namsp", "endpt"),
+                new Exchange("test2", "edr.str1", 1, "namsp1", "endpt1"),
+                new Exchange("test3", "edr.str2", 1, "namesp2", "endpoint2"));
     }
 
     abstract class CustomMinimalForTestResponseSpec implements WebClient.ResponseSpec {

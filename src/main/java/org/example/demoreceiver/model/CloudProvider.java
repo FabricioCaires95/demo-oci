@@ -16,12 +16,19 @@ public enum CloudProvider {
 
     public static String getCloudProvider(Integer cloudProviderId) {
         for (CloudProvider cloudProvider : CloudProvider.values()) {
-            if (cloudProvider.cod.equals(cloudProviderId)) {
-                return cloudProvider.name;
+            if (cloudProvider.getCod().intValue() == cloudProviderId) {
+                return cloudProvider.getName();
             }
         }
 
         throw new IllegalArgumentException("No CloudProvider found for cod: " + cloudProviderId);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Integer getCod() {
+        return cod;
+    }
 }

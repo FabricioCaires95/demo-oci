@@ -1,6 +1,7 @@
 package org.example.demoreceiver.service;
 
 import org.example.demoreceiver.model.Exchange;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Service
-public class ExchangeService {
+public class ExchangeService implements ExchangeDataProvider {
 
     private final WebClient webClient;
 
@@ -19,8 +20,8 @@ public class ExchangeService {
         this.webClient = webClient;
     }
 
-    @Cacheable("exchanges")
     public Mono<List<Exchange>> getExchanges() {
+        System.out.println("Fetching exchanges via API");
         try {
             return webClient.get()
                     .uri("http://localhost:8080/exchanges")
@@ -36,4 +37,9 @@ public class ExchangeService {
         }
     }
 
+    @Override
+    @Cacheable("exchanges")
+    public List<Exchange> fetchExchange() {
+        return getExchanges().block();
+    }
 }
