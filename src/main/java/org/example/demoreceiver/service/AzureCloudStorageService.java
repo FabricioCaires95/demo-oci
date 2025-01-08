@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AzureCloudStorageService implements CloudStorage{
+public class AzureCloudStorageService implements CloudStorage {
 
     private static final Logger logger = LoggerFactory.getLogger(AzureCloudStorageService.class);
 
