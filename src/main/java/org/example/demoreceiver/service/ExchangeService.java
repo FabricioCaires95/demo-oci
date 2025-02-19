@@ -1,7 +1,6 @@
 package org.example.demoreceiver.service;
 
 import org.example.demoreceiver.model.Exchange;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,16 @@ public class ExchangeService implements ExchangeDataProvider {
 
     public Mono<List<Exchange>> getExchanges() {
         System.out.println("Fetching exchanges via API");
+
+        String token = "xxxx";
+
         try {
             return webClient.get()
                     .uri("http://localhost:8080/exchanges")
+                    .headers(httpHeaders -> {
+                        httpHeaders.set("Content-Type", "application/json");
+                        httpHeaders.set("Authorization", token);
+                    })
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                             clientResponse -> clientResponse

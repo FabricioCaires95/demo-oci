@@ -83,9 +83,9 @@ public class ExchangeServiceTest {
 
 
     private List<Exchange> mockExchangeListResponse() {
-        return List.of(new Exchange("test1", "edr.str", 1, "namsp", "endpt"),
-                new Exchange("test2", "edr.str1", 1, "namsp1", "endpt1"),
-                new Exchange("test3", "edr.str2", 1, "namesp2", "endpoint2"));
+        return List.of(new Exchange("test1", "edr.str", 133, 1, "namsp", "endpt", "bootsra1"),
+                new Exchange("test2", "edr.str1", 8788, 1, "namsp1", "endpt1", "bootsra2"),
+                new Exchange("test3", "edr.str2", 133, 1, "namesp2", "endpoint2", "bootsra3"));
     }
 
     abstract class CustomMinimalForTestResponseSpec implements WebClient.ResponseSpec {

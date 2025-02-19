@@ -1,0 +1,9 @@
+
+
+fpb:
+  endpoint:
+    url: "http://fpb.corp.uat"
+spring:
+  config:
+    activate:
+      on-profile: uat

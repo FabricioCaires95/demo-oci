@@ -82,7 +82,7 @@ public class OracleCloudStorageService implements CloudStorage {
     public void copyFileToFileServer(InputStream inputStream, String fileName) {
         String directoryPath = "/opt/oci/file";
         logger.info("Starting to copy file: [{}] to file server: [{}] ", fileName, directoryPath);
-        File file = new File(directoryPath, fileName);
+        final File file = new File(directoryPath, fileName);
 
         try (final FileOutputStream outputStream = new FileOutputStream(file)) {
             byte[] buffer = new byte[8192];

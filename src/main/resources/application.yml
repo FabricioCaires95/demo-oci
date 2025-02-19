@@ -4,13 +4,12 @@ spring:
   threads:
     virtual:
       enabled: false
-  profiles:
-    active: default
 
 
 fpb:
   endpoint:
     url: "http://fpb.corp.default"
+
 
 
 custom:

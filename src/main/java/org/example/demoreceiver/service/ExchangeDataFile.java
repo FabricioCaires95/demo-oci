@@ -68,10 +68,12 @@ public class ExchangeDataFile implements ExchangeDataProvider {
         String bucketName = properties.get("bucketName");
         String endpoint = properties.get("endpoint");
         Integer cloud = Integer.parseInt(properties.get("cloud"));
+        Integer exchangeCode = Integer.parseInt(properties.get("exchangeCode"));
         String streamingPool = properties.get("streamingPool");
         String namespace = properties.get("namespace");
+        String bootstrapServer = properties.get("bootstrapServer");
 
-        return new Exchange(bucketName, endpoint, cloud, streamingPool, namespace);
+        return new Exchange(bucketName, endpoint, exchangeCode, cloud, streamingPool, namespace, bootstrapServer);
     }
 
 }

@@ -1,0 +1,7 @@
+fpb:
+  endpoint:
+    url: "http://fpb.corp.prod"
+spring:
+  config:
+    activate:
+      on-profile: prod
