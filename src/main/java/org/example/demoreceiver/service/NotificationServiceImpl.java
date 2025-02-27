@@ -1,9 +1,11 @@
 package org.example.demoreceiver.service;
 
 import org.example.demoreceiver.model.FileData;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Service
 public class NotificationServiceImpl implements Notification{
 
     private final WebClient webClient;

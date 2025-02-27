@@ -8,9 +8,10 @@ spring:
 
 fpb:
   endpoint:
-    url: "http://fpb.corp.default"
+    url: "http://localhost:8080"
 
-
+configurationFilePath: /home/spacer/.oci/config
+pathToSaveFile: /home/spacer/fste1/file
 
 custom:
   proxy:

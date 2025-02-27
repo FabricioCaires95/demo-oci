@@ -1,104 +1,91 @@
 package org.example.demoreceiver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.example.demoreceiver.model.Exchange;
+import org.example.demoreceiver.model.exception.ExchangeException;
 import org.example.demoreceiver.service.ExchangeService;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExchangeServiceTest {
 
-    @InjectMocks
     private ExchangeService exchangeService;
 
-    @Mock
-    private WebClient webClientMock;
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersMock;
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriMock;
-    @Mock
-    private WebClient.RequestBodySpec requestBodyMock;
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriMock;
-    @Mock
-    private WebClient.ResponseSpec responseMock;
+    private static MockWebServer mockWebServer;
 
-    @Mock
-    private CustomMinimalForTestResponseSpec customMinimalForTestResponseSpec;
+    String endpoint;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeAll
+    static void setUp() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
+
+    @AfterAll
+    static void tearDown() throws IOException {
+        mockWebServer.shutdown();
+    }
 
     @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    public void testRequestSuccess() {
-        when(webClientMock.get()).thenReturn(requestHeadersUriMock);
-        when(requestHeadersUriMock.uri("http://localhost:8080/exchanges")).thenReturn(requestHeadersMock);
-        when(requestHeadersMock.retrieve()).thenReturn(responseMock);
-        when(responseMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseMock);
-        when(responseMock.bodyToMono(ArgumentMatchers.any(ParameterizedTypeReference.class))).thenReturn(Mono.just(mockExchangeListResponse()));
-
-        var response = exchangeService.getExchanges();
-
-        StepVerifier.create(response)
-                .expectNextMatches(exchanges -> exchanges.size() == 3)
-                .verifyComplete();
+    void initialize() {
+        endpoint = mockWebServer.url("/").toString();
+        WebClient webClient = WebClient.builder()
+                .baseUrl(endpoint)
+                .build();
+        exchangeService = new ExchangeService(webClient);
     }
 
 
     @Test
-    public void testRequestSuccess2() {
-        when(webClientMock.get()).thenReturn(requestHeadersUriMock);
-        when(requestHeadersUriMock.uri("http://localhost:8080/exchanges")).thenReturn(requestHeadersMock);
-        when(requestHeadersMock.retrieve()).thenReturn(customMinimalForTestResponseSpec);
-        when(customMinimalForTestResponseSpec.getStatus()).thenReturn(HttpStatus.OK);
-        when(customMinimalForTestResponseSpec.onStatus(any(Predicate.class), any(Function.class))).thenCallRealMethod();
-        when(customMinimalForTestResponseSpec.bodyToMono(ArgumentMatchers.any(ParameterizedTypeReference.class))).thenReturn(Mono.just(mockExchangeListResponse()));
+    public void testRequestSuccess() throws JsonProcessingException {
+        var exchanges = mockExchangeListResponse();
 
-        var response = exchangeService.getExchanges();
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(objectMapper.writeValueAsString(exchanges))
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-        StepVerifier.create(response)
-                .expectNextMatches(exchanges -> exchanges.size() == 3)
-                .verifyComplete();
+        var response = exchangeService.fetchExchange();
+
+        assertNotNull(response);
+        assertEquals(3, response.size());
+        assertEquals("test1", response.getFirst().bucketName());
+    }
+
+
+    @Test
+    public void testRequestFailure() {
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("Error while fetching exchanges via API"));
+
+        var exception = assertThrows(ExchangeException.class, () -> exchangeService.fetchExchange());
+
+        assertTrue(exception.getMessage().contains("Error while fetching exchanges via API"));
     }
 
 
     private List<Exchange> mockExchangeListResponse() {
-        return List.of(new Exchange("test1", "edr.str", 133, 1, "namsp", "endpt", "bootsra1"),
+        return List.of(new Exchange("test1", "edr.str0", 133, 1, "namsp", "endpt", "bootsra1"),
                 new Exchange("test2", "edr.str1", 8788, 1, "namsp1", "endpt1", "bootsra2"),
                 new Exchange("test3", "edr.str2", 133, 1, "namesp2", "endpoint2", "bootsra3"));
     }
-
-    abstract class CustomMinimalForTestResponseSpec implements WebClient.ResponseSpec {
-
-        public abstract HttpStatus getStatus();
-
-        public WebClient.ResponseSpec onStatus(Predicate<HttpStatusCode> statusPredicate, Function<ClientResponse, Mono<? extends Throwable>> exceptionFunction) {
-            if (statusPredicate.test(this.getStatus())) exceptionFunction.apply(ClientResponse.create(HttpStatus.OK).build()).block();
-            return this;
-        }
-
-    }
-
-
 }
 

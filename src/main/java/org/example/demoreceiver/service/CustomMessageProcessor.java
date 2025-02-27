@@ -36,7 +36,7 @@ public class CustomMessageProcessor implements AcknowledgingMessageListener<Stri
 
             cloudStorage.downloadFileFromBucket(exchange.bucketName(), exchange.streamingPool());
 
-            notification.notification(messageData);
+            //notification.notification(messageData);
 
             acknowledgment.acknowledge();
         } catch (KafkaException e) {

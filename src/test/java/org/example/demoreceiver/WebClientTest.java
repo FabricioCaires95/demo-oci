@@ -7,9 +7,7 @@ import org.example.demoreceiver.model.Data;
 import org.example.demoreceiver.model.FileData;
 import org.example.demoreceiver.service.Notification;
 import org.example.demoreceiver.service.NotificationServiceImpl;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -19,8 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WebClientTest {

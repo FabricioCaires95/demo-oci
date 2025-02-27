@@ -1,5 +1,6 @@
 package org.example.demoreceiver;
 
+import org.example.demoreceiver.configuration.OracleAuthenticatorConfig;
 import org.example.demoreceiver.model.CloudProvider;
 import org.example.demoreceiver.service.AwsCloudStorageService;
 import org.example.demoreceiver.service.AzureCloudStorageService;
@@ -19,7 +20,7 @@ public class CloudStorageStrategyManagerTest {
 
     @BeforeEach
     void setup() {
-        cloudStorageStrategyManager = new CloudStorageStrategyManager(List.of(new OracleCloudStorageService(), new AzureCloudStorageService(), new AwsCloudStorageService()));
+        cloudStorageStrategyManager = new CloudStorageStrategyManager(List.of(new OracleCloudStorageService(new OracleAuthenticatorConfig()), new AzureCloudStorageService(), new AwsCloudStorageService()));
     }
 
     @Test
